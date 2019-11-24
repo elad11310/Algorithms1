@@ -11,7 +11,7 @@ import java.util.*;
  * third method is an efficiant way to find 2 max varibels in arr in N + Log n comparisons , in arr of objects of nodes that contains data and stack
  * of candidents to max2.
  */
-public class Main {
+public class Main { /////////////////////
     static class Node {
         int data;
         Stack<Integer> s;
