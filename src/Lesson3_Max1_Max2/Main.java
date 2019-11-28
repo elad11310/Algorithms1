@@ -29,7 +29,7 @@ public class Main { /////////////////////
 
     public static void main(String[] args) {
 
-        final int SIZE = 10;
+        final int SIZE = 50;
         int max1 = 0, max2 = 0;
         int[] arr = new int[SIZE];
         int comparisons = 0;
@@ -56,31 +56,27 @@ public class Main { /////////////////////
         max1 = (arr[0] > arr[1]) ? arr[0] : arr[1]; // insert to max1 the bigger varible.
         max2 = (max1 == arr[0]) ? arr[1] : arr[0]; // insert to max2 the smaller varible.
         int temp = 0;
-        comparisons = 0;
-        for (int i = 2; i < arr.length && i + 1 < arr.length; i++) {
+        comparisons = 1;
+        for (int i = 2; i < arr.length && i + 1 < arr.length; i += 2) {
             if (arr[i] > arr[i + 1]) {
-                comparisons++;
                 if (arr[i] > max1) { // if yes so max2 going out of the game because arr[i] and max1 are bigger
-                    comparisons++;
                     temp = max1;
                     max1 = arr[i];
                     if (temp > arr[i + 1]) {
                         max2 = temp;
-                        comparisons++;
                     } else
                         max2 = arr[i + 1];
                 } else if (arr[i] < max1) { // if so arr[i+1] going out of the game because arr[i] and max1 are bigger
                     if (arr[i] > max2)
                         max2 = arr[i];
                 }
+                comparisons += 3;
             } else if (arr[i] < arr[i + 1]) {
                 if (arr[i + 1] > max1) { // if so max2 is going out of the game because arr[i+1] and max1 are bigger
-                    comparisons++;
                     temp = max1;
                     max1 = arr[i + 1];
                     if (temp > arr[i]) {
                         max2 = temp;
-                        comparisons++;
                     } else
                         max2 = arr[i];
                 } else if (arr[i + 1] < max1) { // if so arr[i] going out of the game because arr[i+1] and max1 are bigger
@@ -88,6 +84,7 @@ public class Main { /////////////////////
                         max2 = arr[i + 1];
 
                 }
+                comparisons += 3;
 
             }
         }
