@@ -103,45 +103,45 @@ public class Main { /////////////////////
             l.add(new Node((int) (Math.random() * 500 + 1)));
             System.out.print(l.get(i).data + " ");
         }
-            System.out.println();
-            int i = 0;
-            comparisons = 0;
-            while (l.size() > 1) { // while list has elements.
+        System.out.println();
+        int i = 0;
+        comparisons = 0;
+        while (l.size() > 1) { // while list has elements.
 
-                Node first = l.get(i);
-                Node second = l.get(i + 1);
+            Node first = l.get(i);
+            Node second = l.get(i + 1);
 
-                if (first.data > second.data) {
-                    comparisons++;
+            if (first.data > second.data) {
+                comparisons++;
 
-                    first.s.push(second.data); // putting the "Loser data into the winner stack
-                    l.remove(l.indexOf(second)); // removing the loser node
-
-
-                } else  {
-
-                    second.s.push(first.data); // putting the "Loser data into the max1 stack
-                    l.remove(l.indexOf(first)); // removing the loser node
+                first.s.push(second.data); // putting the "Loser data into the winner stack
+                l.remove(l.indexOf(second)); // removing the loser node
 
 
-                }
-                i++;
-                if (i >= l.size() - 1)
-                    i = 0;
+            } else {
+
+                second.s.push(first.data); // putting the "Loser data into the max1 stack
+                l.remove(l.indexOf(first)); // removing the loser node
+
+
             }
-            Node max = l.get(0); // setting a new node to the vaule of the last node left in the list , the max1 winnter
-            max2 = max.s.pop();
-            while (!max.s.isEmpty()) { // iterating through the max node stack
-                int data = max.s.pop();
-                if (data > max2) {
-                    comparisons++;
-                    max2 = data;
-                }
-            }
-
-            System.out.println(" Third Method : Max1 is " + max.data + " Max2 is " + max2 + " Number of  comparisons " + comparisons);
-
+            i++;
+            if (i >= l.size() - 1)
+                i = 0;
         }
+        Node max = l.get(0); // setting a new node to the vaule of the last node left in the list , the max1 winnter
+        max2 = max.s.pop();
+        while (!max.s.isEmpty()) { // iterating through the max node stack
+            int data = max.s.pop();
+            if (data > max2) {
+                comparisons++;
+                max2 = data;
+            }
+        }
+
+        System.out.println(" Third Method : Max1 is " + max.data + " Max2 is " + max2 + " Number of  comparisons " + comparisons);
+
     }
+}
 
 
