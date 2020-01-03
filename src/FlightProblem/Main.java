@@ -15,8 +15,10 @@ public class Main {
     public static int size = 5;
     static String[] initArr;
 
+
     static class Node {
         int value; // shortest way to reach this node
+        int reverseValue; // shortest way to reach this node from the reverse check
         int right; // right value
         int down; // down value
         ArrayList<String> pred; // saving the node we came from
@@ -26,6 +28,7 @@ public class Main {
 
         public Node(int right, int down) {
             this.value = 0;
+            this.reverseValue=0;
             this.right = right;
             this.down = down;
             pred = new ArrayList<>();
@@ -71,26 +74,38 @@ public class Main {
             }
         }
 
-        initColAndRow(mat, 0, 0,true);
+        initColAndRow(mat, false);
 
 
     }
 
-    private static void initColAndRow(Node[][] mat, int I, int J, boolean isFirst) {
-        int i;
-        // initialling the values of the col
-        for (i = J + 1; i < mat[0].length; i++) {
-            mat[I][i].value = mat[I][i - 1].value + mat[I][i - 1].right;
-            if (isFirst)
-                mat[I][i].pred.set(0, "R");
-        }
+    private static void initColAndRow(Node[][] mat, boolean isReverse) {
+        int i = 0, j = 0;
+        if (!isReverse) { // if we initialize the row and col from 0,0
+            // initialling the values of the col
+            for (j = 1; j < mat[0].length; j++) {
+                mat[i][j].value = mat[i][j - 1].value + mat[i][j - 1].right;
+                mat[i][j].pred.set(0, "R");
+            }
 
-        /// initializing the values of the row
+            /// initializing the values of the row
+            j = 0;
+            for (i = 1; i < mat.length; i++) {
+                mat[i][j].value = mat[i - 1][j].value + mat[i - 1][j].down;
+                mat[i][j].pred.set(0, "D");
+            }
+        } else { // if we wanna run on reverse and initialize from size-1 row and col
+            i = size - 1;
+            for (j = size - 2; j >= 0; j--) {
+                mat[i][j].reverseValue = mat[i][j + 1].reverseValue + mat[i][j].right;
+            }
 
-        for (i = I + 1; i < mat.length; i++) {
-            mat[i][J].value = mat[i - 1][J].value + mat[i - 1][J].down;
-            if (isFirst)
-                mat[i][J].pred.set(0, "D");
+            /// initializing the values of the row
+            j = size - 1;
+            for (i = size - 2; i >= 0; i--) {
+                mat[i][j].reverseValue = mat[i + 1][j].reverseValue + mat[i][j].down;
+
+            }
         }
 
     }
@@ -106,30 +121,21 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        flightProbInit(mat, initArr); // first check from 0,0 to size-1,size-1
-        int shortest = shortestPath(mat, 1, 1, size - 1, size - 1, true);
+        // first check from 0,0 to size-1,size-1
+        flightProbInit(mat, initArr);
+        int shortest = shortestPath(mat, 1, 1);
         System.out.println("shortest " + shortest);
+        // now check from size-1 to 0,0
+        int shortestReverse = shortestPathReverse(mat, size - 2, size - 2);
+        System.out.println(shortestReverse);
 
-
-        for (i = 0; i < mat.length; i++) {
-            for (j = 0; j < mat[0].length; j++) {
-                if (i == 0 && j == 0) {
-                    System.out.println("here");
-                    j++;
-                }
-                //int temp = mat[i][j].value;
-
-
-                mat[i][j].value = 0;
-                int a = shortestPath(mat, i + 1, j + 1, mat.length - 1, mat.length - 1, false);
-                int b = shortestPath(mat, 1, 1, i, j, false);
-                System.out.println(a);
-                System.out.println(b);
-                if (a + b == shortest) {
+        // checking if a node is in the short way
+        for(i=0;i<mat.length;i++){
+            for (j=0;j<mat[0].length;j++){
+                if(mat[i][j].value +mat[i][j].reverseValue == shortest){
                     mat[i][j].isInShortPath = true;
                 }
             }
-
         }
 
         for (i = 0; i < mat.length; i++) { // printing the nodes on the shortest ways.
@@ -140,39 +146,28 @@ public class Main {
             }
         }
 
-
-        //List<String> path = new ArrayList<>();
-
-        findPaths(mat, "", 0, 0);
+        // find all short paths and print them recursively
+        List<String> allPaths = new ArrayList<>();
+        findPaths(mat, "", 0, 0,allPaths);
+        FlightPathGUI flightPathGUI = new FlightPathGUI(size,mat,allPaths);
 
 
     }
 
-    private static int shortestPath(Node[][] mat, int srcX, int srcY, int desX, int desY, boolean isFirst) {
+
+    private static int shortestPathReverse(Node[][] mat, int srcX, int srcY){
+        int i,j;
+        initColAndRow(mat,true);
+        for (i = srcX; i>=0; i--) {
+            for (j = srcY; j>=0; j--) {
+                mat[i][j].reverseValue = minForPath(mat[i + 1][j].reverseValue + mat[i][j].down, mat[i][j + 1].reverseValue + mat[i][j].right);
+            }
+        }
+        return mat[0][0].reverseValue;
+
+    }
+    private static int shortestPath(Node[][] mat, int srcX, int srcY) {
         int i, j;
-
-        // initialize  the first row and first col
-        initColAndRow(mat, srcX - 1, srcY - 1,false);
-
-
-        if (srcY == size) // means we need to check last row
-        {
-            for (i = srcX; i < mat.length; i++) {
-                mat[i][srcY - 1].value = mat[i - 1][srcY - 1].value + mat[i - 1][srcY - 1].down;
-
-            }
-            return mat[size - 1][size - 1].value;
-        }
-
-        if (srcX == size) // means we need to check last col
-        {
-            for (i = srcY; i < mat.length; i++) {
-                mat[srcX - 1][srcY].value = mat[srcX - 1][i - 1].value + mat[srcX - 1][i - 1].right;
-
-            }
-            return mat[size - 1][size - 1].value;
-        }
-
 
         for (i = srcX; i < mat.length; i++) { // initializing the rest of the values from (1,1).
             for (j = srcY; j < mat[i].length; j++) {
@@ -180,39 +175,33 @@ public class Main {
                 mat[i][j].value = minForPath(mat[i - 1][j].value + mat[i - 1][j].down, mat[i][j - 1].value + mat[i][j - 1].right); // updating the shortest value untill this node
                 down = mat[i - 1][j].value + mat[i - 1][j].down;
                 right = mat[i][j - 1].value + mat[i][j - 1].right;
-                if (isFirst) { // we wanna save the wights from Start to End and keep them for rest of the checks
-                    // saving the node we came from
-                    if (down > right) {
-                        mat[i][j].pred.set(0, "R");
-                    } else if (right > down) {
-                        mat[i][j].pred.set(0, "D");
-                    } else {
-                        mat[i][j].pred.set(0, "D");
-                        mat[i][j].pred.set(1, "R");
-                    }
+                // saving the node we came from
+                if (down > right) {
+                    mat[i][j].pred.set(0, "R");
+                } else if (right > down) {
+                    mat[i][j].pred.set(0, "D");
+                } else {
+                    mat[i][j].pred.set(0, "D");
+                    mat[i][j].pred.set(1, "R");
+                }
 
-                    /// checking how many same short ways until this node
-                    if (mat[i - 1][j].value + mat[i - 1][j].down == mat[i][j - 1].value + mat[i][j - 1].right) {
-                        mat[i][j].allPaths = mat[i - 1][j].allPaths + mat[i][j - 1].allPaths;
+                /// checking how many same short ways until this node
+                if (down == right) {
+                    mat[i][j].allPaths = mat[i - 1][j].allPaths + mat[i][j - 1].allPaths;
 
-                    } else if (mat[i - 1][j].value + mat[i - 1][j].down < mat[i][j - 1].value + mat[i][j - 1].right) {
+                } else if (down < right) {
 
-                        mat[i][j].allPaths = mat[i - 1][j].allPaths;
-                    } else {
-                        mat[i][j].allPaths = mat[i][j - 1].allPaths;
-
-                    }
-
+                    mat[i][j].allPaths = mat[i - 1][j].allPaths;
+                } else {
+                    mat[i][j].allPaths = mat[i][j - 1].allPaths;
 
                 }
 
 
             }
-            if (i == desX && j == desY) // if we check from A to each node except lsat.
-                break;
         }
         // returns the last node of the mat with the shortest way.
-        return mat[desX][desY].value;
+        return mat[size - 1][size - 1].value;
     }
 
 
@@ -222,7 +211,7 @@ public class Main {
 
 
     private static void findPaths(Node[][] mat, String path,
-                                  int i, int j) {
+                                  int i, int j, List<String> allPaths) {
 
         /// this function prints recursively the fastest way to the destination.
         int M = mat.length;
@@ -231,17 +220,17 @@ public class Main {
         // if we have reached the last cell, print the route
         if (i == M - 1 && j == N - 1) {
             System.out.println(path);
-
+            allPaths.add(path);
         } else {
 
             // move right
-            if (i < M && j + 1 < N && mat[i][j + 1].isInShortPath && mat[i][j+1].pred.contains("R")) {
-                findPaths(mat, path + "R", i, j + 1);
+            if (i < M && j + 1 < N && mat[i][j + 1].isInShortPath && mat[i][j + 1].pred.contains("R")) {
+                findPaths(mat, path + "R", i, j + 1,allPaths);
             }
 
             // move down
             if (i + 1 < M && j < N && mat[i + 1][j].isInShortPath && mat[i + 1][j].pred.contains("D")) {
-                findPaths(mat, path + "D", i + 1, j);
+                findPaths(mat, path + "D", i + 1, j,allPaths);
             }
         }
 
