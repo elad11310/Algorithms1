@@ -1,6 +1,10 @@
 package Pizza_Sumulation;
 
-import java.util.ArrayList;
+/**
+ * pizza simulation is testing two people eating pizza and the first of them has a normal eating speed and the other is n*the normal eating speed, which means
+ * if n==2 the second person eats 2 times faster then the first and if n==3 the second person eats 3 times faster then the first ,etc...
+ * so this simulation is providing the optimal amount of slices the pizza needs to be cut for the second person(the faster eater) will eat the most amount of pizza.
+ */
 
 public class Main {
 
