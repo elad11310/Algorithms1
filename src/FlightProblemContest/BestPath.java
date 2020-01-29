@@ -20,28 +20,97 @@ public class BestPath {
     private void initMat(Node[][] mat) {
         initColAndRow(mat); // init first col and first row.
         int i, j;
-        double up, right;
+        double up, right, upSec, rightSec;
         for (i = mat.length - 2; i >= 0; i--) { // initializing the rest of the values from (1,1).
             for (j = 1; j < mat[i].length; j++) {
-
+                upSec = mat[i + 1][j].secondValue + mat[i + 1][j].y;
+                rightSec = mat[i][j - 1].secondValue + mat[i][j - 1].x;
                 right = mat[i][j - 1].value + mat[i][j - 1].x; // the node from down + its value till this node
                 up = mat[i + 1][j].value + mat[i + 1][j].y;
                 mat[i][j].value = minForPath(up, right); // updating the shortest value until this node
-                if(i==1 && j==1){ // first node to initialize second value path
-                    mat[i][j].secondValue = maxForPath(up,right);
+                if (i == mat.length - 2 && j == 1) { // first node to initialize second value path
+                    if (up != right) {
+                        mat[i][j].secondValue = maxForPath(up, right);
+                    }
+
                 }
+//                else if (mat[i + 1][j].secondValue == 0 && mat[i][j - 1].secondValue == 0) {
+//                    mat[i][j].secondValue = 0;
+//                }
                 // if we ask on the secondValue of the first row
-                if(mat[i+1][j].secondValue == 0){
-                    mat[i][j].secondValue = minForPath(mat[i+1][j].value+mat[i+1][j].y,mat[i][j-1].secondValue+mat[i][j-1].x);
+                else if (mat[i + 1][j].secondValue == 0) {
+                    if (mat[i][j - 1].secondValue != 0) {
+                        mat[i][j].secondValue = minForPath(mat[i + 1][j].value + mat[i + 1][j].y, mat[i][j - 1].secondValue + mat[i][j - 1].x);
+                        if (rightSec < up) {
+                            mat[i][j].allPaths2 = mat[i][j - 1].allPaths2;
+                        } else if (up == rightSec) {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths + mat[i][j - 1].allPaths2;
+                        } else {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths;
+                        }
+                    } else {
+                        mat[i][j].secondValue = mat[i + 1][j].value + mat[i + 1][j].y;
+                        mat[i][j].allPaths2 = mat[i + 1][j].allPaths;
+                    }
+
                 }
                 // if we ask on the secondValue of the first col
-                else if (mat[i][j-1].secondValue==0){
-                    mat[i][j].secondValue = minForPath(mat[i][j-1].value+mat[i][j-1].x,mat[i+1][j].secondValue+mat[i+1][j].y);
-                }
-                else{
-                    mat[i][j].secondValue = minForPath(mat[i][j-1].secondValue+mat[i][j-1].x,mat[i+1][j].secondValue+mat[i+1][j].y);
-                }
+                else if (mat[i][j - 1].secondValue == 0) {
+                    if (mat[i + 1][j].secondValue != 0) {
+                        mat[i][j].secondValue = minForPath(mat[i][j - 1].value + mat[i][j - 1].x, mat[i + 1][j].secondValue + mat[i + 1][j].y);
 
+                        if (upSec < right) {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths2;
+                        } else if (upSec == right) {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths2 + mat[i][j - 1].allPaths;
+                        } else {
+                            mat[i][j].allPaths2 = mat[i][j - 1].allPaths;
+                        }
+
+                    } else {
+                        mat[i][j].secondValue = mat[i][j - 1].value + mat[i][j - 1].x;
+                        mat[i][j].allPaths2 = mat[i][j - 1].allPaths;
+                    }
+
+
+                } else {
+
+                    if (right < up) {
+                        mat[i][j].secondValue = minForPath(mat[i][j - 1].secondValue + mat[i][j - 1].x, mat[i + 1][j].value + mat[i + 1][j].y);
+                        if (rightSec < up) {
+                            mat[i][j].allPaths2 = mat[i][j - 1].allPaths2;
+                        } else if (up == rightSec) {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths + mat[i][j - 1].allPaths2;
+                        } else {
+                            mat[i][j].allPaths2 = mat[i + 1][j].allPaths;
+                        }
+                    } else {
+                        if (up == right) {
+                            mat[i][j].secondValue = minForPath(mat[i + 1][j].secondValue + mat[i + 1][j].y, mat[i][j - 1].secondValue + mat[i][j - 1].x);
+                            if(upSec<rightSec){
+                                mat[i][j].allPaths2 = mat[i+1][j].allPaths2;
+                            }
+                            else if(upSec>rightSec){
+                                mat[i][j].allPaths2 = mat[i][j-1].allPaths2;
+                            }
+                            else{
+                                mat[i][j].allPaths2 = mat[i][j-1].allPaths2+mat[i+1][j].allPaths2;
+                            }
+                        } else{
+                            mat[i][j].secondValue = minForPath(mat[i + 1][j].secondValue + mat[i + 1][j].y, mat[i][j - 1].value + mat[i][j - 1].x);
+                            if (upSec < right) {
+                                mat[i][j].allPaths2 = mat[i + 1][j].allPaths2;
+                            } else if (upSec == right) {
+                                mat[i][j].allPaths2 = mat[i + 1][j].allPaths2 + mat[i][j - 1].allPaths;
+                            } else {
+                                mat[i][j].allPaths2 = mat[i][j - 1].allPaths;
+                            }
+                        }
+
+                    }
+
+                }
+                System.out.println(mat[i][j].value + " " + mat[i][j].secondValue);
 
                 // checking maneuver change and shortest paths.
                 if (up > right) { // if we come to this node only from right (value determines)
@@ -60,7 +129,16 @@ public class BestPath {
 
                     if (mat[i][j - 1].lowestDirectionChange == mat[i + 1][j].lowestDirectionChange ||
                             Math.abs(mat[i][j - 1].lowestDirectionChange - mat[i + 1][j].lowestDirectionChange) == 1) {
-                        if (mat[i + 1][j].lowestDirectionChange >mat[i][j - 1].lowestDirectionChange) {
+
+                        if (j == mat.length - 1 && i == 0) {
+                            if (mat[i + 1][j].lowestDirectionChange > mat[i][j - 1].lowestDirectionChange) {
+                                checkManeuverChange(i, j - 1, i, j, '0');
+                                checkManeuverChange(i + 1, j, i, j, '1');
+                            } else {
+                                checkManeuverChange(i + 1, j, i, j, '1');
+                                checkManeuverChange(i, j - 1, i, j, '0');
+                            }
+                        } else if (mat[i + 1][j].lowestDirectionChange > mat[i][j - 1].lowestDirectionChange) {
                             checkManeuverChange(i + 1, j, i, j, '1');
                             checkManeuverChange(i, j - 1, i, j, '0');
                         } else {
@@ -82,8 +160,8 @@ public class BestPath {
                     concatShortestPaths(i, j - 1, i, j, '0');
                     concatShortestPaths(i + 1, j, i, j, '1');
                 }
-                System.out.println(mat[i][j].lowestManeuver);
-                System.out.println(mat[i][j].lowestDirectionChange);
+                //  System.out.println(mat[i][j].lowestManeuver);
+                //System.out.println(mat[i][j].lowestDirectionChange);
 
 
                 /// checking how many same short ways until this node
@@ -94,9 +172,13 @@ public class BestPath {
 
                     mat[i][j].allPaths = mat[i + 1][j].allPaths;
                 } else {
+
                     mat[i][j].allPaths = mat[i][j - 1].allPaths;
 
                 }
+
+                System.out.println(mat[i][j].allPaths);
+                System.out.println(mat[i][j].allPaths2);
 
 
             }
@@ -112,7 +194,6 @@ public class BestPath {
             min = mat[i][j].lowestDirectionChange;
         } else
             min = mat[k][p].lowestDirectionChange; // if its empty take the lowest maneuver from the node we came from
-
 
 
         for (int q = 0; q < mat[k][p].lowestManeuver.size(); q++) { // iterating through the list of paths
@@ -211,6 +292,7 @@ public class BestPath {
     private static double minForPath(double up, double right) {
         return (up < right) ? up : right;
     }
+
     private static double maxForPath(double up, double right) {
         return (up < right) ? right : up;
     }
@@ -298,17 +380,26 @@ public class BestPath {
     }
 
 
-
     /////////// part B functions \\\\\\\\\\\\\\\\\\\\
 
-    public int getNumOfOptimalPaths2(){ // returns the number of paths with second optimal paths.
-        return mat[0][mat.length-1].secondManeuver.size();
+    public int getNumOfOptimalPaths2() { // returns the number of paths with second optimal paths.
+        return mat[0][mat.length - 1].secondManeuver.size();
     }
-    public ArrayList<String> getAllOptimalPaths2(){ // returns all the second optimal paths.
-        return mat[0][mat.length-1].secondManeuver;
+
+    public ArrayList<String> getAllOptimalPaths2() { // returns all the second optimal paths.
+        return mat[0][mat.length - 1].secondManeuver;
     }
-    public int getNumOfTurns2(){ // returns the number of turns in the second optimal paths.
-        return mat[0][mat.length-1].secondDirectionChange;
+
+    public int getNumOfTurns2() { // returns the number of turns in the second optimal paths.
+        return mat[0][mat.length - 1].secondDirectionChange;
+    }
+
+    public double getCheapestPrice2() {
+        return mat[0][mat.length - 1].secondValue;
+    }
+
+    public int getNumOfCheapestPaths2() {
+        return mat[0][mat.length - 1].allPaths2;
     }
 
     public static void main(String[] args) {
@@ -337,7 +428,8 @@ public class BestPath {
 //        System.out.println("all the second optimal paths " + s);
 //        System.out.println("num of turns in the second optimal paths " + b.getNumOfTurns2());
 
-
+        System.out.println("Second shortest value " + b.getCheapestPrice2());
+         System.out.println(" all Second shortest paths " + b.getNumOfCheapestPaths2());
         long end = System.currentTimeMillis();
         System.out.println("Start :" + start + " End : " + end);
 
