@@ -17,13 +17,16 @@ public class Node {
     ArrayList<String> lowestManeuver; // saving the lowest maneuver paths
     ArrayList<String> secondManeuver; // saving the second lowest maneuver paths
     int secondDirectionChange; // for counting the second lowest maneuver paths.
-    public Node(double x, double y) {
+    ArrayList<String> shortestPaths2;
+
+     public Node(double x, double y) {
         this.x = x;
         this.y = y;
         this.value = 0;
         this.reverseValue = 0;
         secondValue = 0;
         shortestPaths = new ArrayList<>();
+        shortestPaths2 = new ArrayList<>();
         allPaths = 1;
         isInShortPath = false;
         leastDirectionChange = "";
@@ -32,6 +35,7 @@ public class Node {
         secondManeuver = new ArrayList<>();
         secondDirectionChange = 0;
         allPaths2 = 0;
+
 
 
     }
