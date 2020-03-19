@@ -37,13 +37,13 @@ public class Main {
         System.out.println(ans);*/
 
         int[][] mat =
-                {{1, 0, 0, 1, 1, 1},
-                        {1, 0, 1, 1, 0, 1},
-                        {0, 1, 1, 1, 1, 1},
-                        {0, 1, 1, 1, 1, 1}};
+                {{1,0,0,1,1,1},
+                        {1,0,1,1,1,1},
+                        {0, 1,1,1,1,1},
+                        {0, 1, 1, 1,1, 1}};
 
 
-        int ans = findRectangle(mat);
+        int ans = greedySearch2D(mat);
         System.out.println(ans);
 
     }
@@ -112,24 +112,77 @@ public class Main {
         return max;
     }
 
-   /* public static int greedySearch2D(int [][]arr){
-        int i,j,k,p,count=0,max=0;
-        for(i=0;i<arr.length;i++){
-            for(j=0;j<arr[0].length;j++){
-                if(arr[i][j]==1 ){ // check for expand
-                    count++;
-                   if(arr[i+1][j+1]==1)
-                    for(p=1;p<=k;p++){
-                        if(arr[])
+    public static int greedySearch2D(int[][] arr) {
+        int N = arr.length;
+        int M = arr[0].length;
+        boolean flag;
+        int min = N<M?N:M; // check the maximum size of the square.
+        int i, j,k,q,p,m,ans=0,max=0;
+        for (i = 0; i <N;i++){
+            for(j=0;j<M;j++){
+                if(arr[i][j]!=1) // only if we are on 1,
+                    continue;
+                if(ans>max){
+                    max=ans;
+                }
+                p=i;
+                q=j;
+                flag=true;
+                ans=1;
+                for(k=1;k<=min && flag;k++){
+                    if(p+1<N && q+1<M && arr[p+1][q+1]==1){ // if there is a chance for a square.
+                        p=p+1;
+                        q=q+1;
+                        for(m=1;m<=k;m++){ // checking the row and cols from the most right down variable of the square
+                            if(arr[p-m][q]==0 || arr[p][q-m]==0){
+                                flag = false;
+                                break;
+                            }
+
+
+                        }
+                        if(flag)
+                            ans++;
                     }
+                    else
+                        break;
                 }
-                if(count>max){
-                    max=count;
-                }
+
 
             }
         }
-    }*/
+        return max;
+    }
+
+    public static int fullSearch2d(int[][] mat) {
+        int N = mat.length;
+        int M = mat[0].length;
+        int max = 0;
+        // we will make all the possible sub mats 1X1 2X2 ..NXN
+        int i, k, j;
+        for (k = 1; k <= N; k++) {
+            for (i = 0; i <= N - k; i++) {
+                for (j = 0; j <= M - k; j++) {
+                    if (checkOnesFullSearch(mat, i, j, i + k - 1, j + k - 1)) {
+                        max = k;
+                    }
+
+                }
+            }
+        }
+        return max;
+    }
+
+    private static boolean checkOnesFullSearch(int[][] mat, int i, int j, int p, int q) {
+        for (int I = i; I <= p; I++) {
+            for (int J = j; J <= q; J++) {
+                if (mat[I][J] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     public static int dynamicSearch2D(int[][] arr) {
         int i, j, max = 0;
@@ -171,7 +224,6 @@ public class Main {
         return i <= j ? i : j;
     }
 
-
     public static int findRectangle(int[][] mat) {
         int i, j, count = 0, max = 1, maxRec = 0, startSec = 0, min = 0;
         int[][] newMat = new int[mat.length][mat[0].length];
@@ -182,9 +234,9 @@ public class Main {
                 count++;
 
             }
-            if (newMat[i][j] == 0 || j == newMat[i].length - 1) {
+            if (newMat[i][j] == 0 || j == newMat[i].length - 1) { // checks the length of the sequence till now , compare with max also
                 if (count > max) {
-                    startSec = j - count + 1;
+                    startSec = j - count + 1; // saving the index of the sequence start.
                     max = count;
                 }
 
@@ -194,7 +246,7 @@ public class Main {
         }
 
         maxRec = max * 1; // first row max sequential *1 because there are only ones in the first row
-        for (i = 1; i < mat.length; i++) {
+        for (i = 1; i < mat.length; i++) { // now checking the rest of the rows.
             count = 0;
             max = 1;
             for (j = 0; j < mat[0].length; j++) {
